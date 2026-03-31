@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="light" lang="en" id="html-root">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Budget Pro | Multi-Theme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ios: {
+                            blue: '#007AFF',
+                            bgLight: '#F2F2F7',
+                            bgDark: '#000000',
+                            cardLight: '#FFFFFF',
+                            cardDark: '#1C1C1E'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
+        .tab-active { color: #007AFF !important; border-top: 2px solid #007AFF; opacity: 1 !important; }
+        .cat-btn.active { background: #007AFF; color: white; transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-ios-bgLight dark:bg-ios-bgDark text-black dark:text-white min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 px-6 py-4">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Net Spendable</p>
+            <h1 id="main-balance" class="text-2xl font-extrabold text-ios-blue">₹0</h1>
+        </div>
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center">
+            <span id="theme-icon" class="material-symbols-outlined text-sm">dark_mode</span>
+        </button>
+    </div>
+</header>
+
+<main class="flex-grow pt-24 pb-32 px-6 max-w-md mx-auto w-full">
+    
+    <div id="view-add" class="view-content">
+        <section class="mb-6">
+            <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-ios-blue">₹</span>
+                <input id="entry-amount" class="w-full bg-transparent border-none p-0 text-5xl font-black focus:ring-0 placeholder:text-gray-300 dark:placeholder:text-gray-700" placeholder="0" type="number"/>
+            </div>
+        </section>
+
+        <div class="bg-ios-cardLight dark:bg-ios-cardDark rounded-2xl p-5 shadow-sm mb-4">
+            <h3 class="text-gray-400 font-bold text-[10px] uppercase mb-4">Quick Select</h3>
+            <div class="grid grid-cols-3 gap-3" id="cat-grid">
+                <button onclick="setCat('Grocery', this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">shopping_basket</span>
+                    <span class="text-[10px] font-bold">Grocery</span>
+                </button>
+                <button onclick="setCat('Utility', this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">lightbulb</span>
+                    <span class="text-[10px] font-bold">Utility</span>
+                </button>
+                <button onclick="setCat('Transport', this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">directions_car</span>
+                    <span class="text-[10px] font-bold">Transport</span>
+                </button>
+                <button onclick="setCat('Medicine', this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">medical_services</span>
+                    <span class="text-[10px] font-bold">Medicine</span>
+                </button>
+                <button onclick="setCat('Food', this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">restaurant</span>
+                    <span class="text-[10px] font-bold">Dining</span>
+                </button>
+                <button onclick="enableCustomCat(this)" class="cat-btn flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-white/5 transition-all">
+                    <span class="material-symbols-outlined text-lg mb-1">more_horiz</span>
+                    <span class="text-[10px] font-bold">Other</span>
+                </button>
+            </div>
+            <input id="custom-cat-name" type="text" placeholder="Specify expense..." class="hidden w-full mt-4 bg-gray-50 dark:bg-white/5 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-ios-blue text-black dark:text-white"/>
+        </div>
+
+        <button onclick="handleLog()" class="w-full bg-ios-blue text-white py-4 rounded-2xl font-bold text-lg shadow-lg active:opacity-80 transition-all">
+            Log Entry
+        </button>
+    </div>
+
+    <div id="view-list" class="view-content hidden">
+        <div class="flex gap-2 mb-4">
+            <button onclick="setFilter('all')" id="filter-all" class="flex-1 py-2 rounded-lg bg-ios-blue text-white text-xs font-bold transition-all">All History</button>
+            <button onclick="setFilter('weekly')" id="filter-week" class="flex-1 py-2 rounded-lg bg-ios-cardLight dark:bg-ios-cardDark text-gray-500 text-xs font-bold transition-all">Weekly</button>
+        </div>
+        
+        <div class="bg-ios-cardLight dark:bg-ios-cardDark rounded-2xl p-4 shadow-sm min-h-[300px]">
+            <div id="history-list" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="view-settings" class="view-content hidden">
+        <div class="bg-ios-cardLight dark:bg-ios-cardDark rounded-2xl p-6 shadow-sm">
+            <h3 class="text-gray-400 font-bold text-[10px] uppercase mb-4">Monthly Setup</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">Total Income</label>
+                    <input id="t-income" type="number" oninput="saveSet()" class="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl p-4 text-sm mt-1"/>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">Savings Goal</label>
+                    <input id="t-save" type="number" oninput="saveSet()" class="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl p-4 text-sm mt-1"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<nav class="fixed bottom-0 w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 flex justify-around items-center px-4 pb-8 pt-3">
+    <button onclick="switchTab('view-list', this)" class="nav-item flex flex-col items-center opacity-40">
+        <span class="material-symbols-outlined">history</span>
+        <span class="text-[10px] font-bold uppercase mt-1">History</span>
+    </button>
+    <button onclick="switchTab('view-add', this)" class="nav-item flex flex-col items-center tab-active">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+        <span class="text-[10px] font-bold uppercase mt-1">Record</span>
+    </button>
+    <button onclick="switchTab('view-settings', this)" class="nav-item flex flex-col items-center opacity-40">
+        <span class="material-symbols-outlined">monitoring</span>
+        <span class="text-[10px] font-bold uppercase mt-1">Budget</span>
+    </button>
+</nav>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('iosFounderDB')) || { income: 0, target: 0, entries: [] };
+    let selectedCat = 'Misc';
+    let currentFilter = 'all';
+
+    window.onload = () => {
+        document.getElementById('t-income').value = db.income || '';
+        document.getElementById('t-save').value = db.target || '';
+        if (localStorage.getItem('theme') === 'dark') toggleTheme();
+        refresh();
+    };
+
+    function toggleTheme() {
+        const root = document.getElementById('html-root');
+        const icon = document.getElementById('theme-icon');
+        if (root.classList.contains('dark')) {
+            root.classList.remove('dark');
+            icon.innerText = 'dark_mode';
+            localStorage.setItem('theme', 'light');
+        } else {
+            root.classList.add('dark');
+            icon.innerText = 'light_mode';
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    function switchTab(id, btn) {
+        document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+    }
+
+    function setCat(name, btn) {
+        selectedCat = name;
+        document.getElementById('custom-cat-name').classList.add('hidden');
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function enableCustomCat(btn) {
+        selectedCat = 'CUSTOM';
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('custom-cat-name').classList.remove('hidden');
+        document.getElementById('custom-cat-name').focus();
+    }
+
+    function handleLog() {
+        const amt = parseFloat(document.getElementById('entry-amount').value);
+        let name = selectedCat;
+        if(selectedCat === 'CUSTOM') name = document.getElementById('custom-cat-name').value || 'Other';
+        
+        if (amt > 0) {
+            db.entries.unshift({ id: Date.now(), amt, name, date: new Date().toISOString() });
+            document.getElementById('entry-amount').value = '';
+            document.getElementById('custom-cat-name').value = '';
+            refresh();
+            switchTab('view-list', document.querySelectorAll('.nav-item')[0]);
+        }
+    }
+
+    function setFilter(f) {
+        currentFilter = f;
+        document.getElementById('filter-all').className = f === 'all' ? 'flex-1 py-2 rounded-lg bg-ios-blue text-white text-xs font-bold' : 'flex-1 py-2 rounded-lg bg-ios-cardLight dark:bg-ios-cardDark text-gray-500 text-xs font-bold';
+        document.getElementById('filter-week').className = f === 'weekly' ? 'flex-1 py-2 rounded-lg bg-ios-blue text-white text-xs font-bold' : 'flex-1 py-2 rounded-lg bg-ios-cardLight dark:bg-ios-cardDark text-gray-500 text-xs font-bold';
+        renderHistory();
+    }
+
+    function refresh() {
+        const totalExp = db.entries.reduce((s, e) => s + e.amt, 0);
+        const balance = db.income - db.target - totalExp;
+        document.getElementById('main-balance').innerText = `₹${balance.toLocaleString()}`;
+        document.getElementById('main-balance').className = balance < 0 ? 'text-2xl font-extrabold text-red-500' : 'text-2xl font-extrabold text-ios-blue';
+        renderHistory();
+        localStorage.setItem('iosFounderDB', JSON.stringify(db));
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        let filtered = db.entries;
+        if(currentFilter === 'weekly') {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            filtered = db.entries.filter(e => new Date(e.date) > weekAgo);
+        }
+        filtered.forEach(e => {
+            const d = new Date(e.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            list.innerHTML += `
+                <div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-white/5">
+                    <div><p class="text-xs font-bold">${e.name}</p><p class="text-[10px] text-gray-400 uppercase">${d}</p></div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-black">-₹${e.amt.toLocaleString()}</span>
+                        <button onclick="del(${e.id})" class="text-gray-300 hover:text-red-500 material-symbols-outlined text-sm">delete</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function saveSet() {
+        db.income = parseFloat(document.getElementById('t-income').value) || 0;
+        db.target = parseFloat(document.getElementById('t-save').value) || 0;
+        refresh();
+    }
+
+    function del(id) {
+        db.entries = db.entries.filter(e => e.id !== id);
+        refresh();
+    }
+</script>
+</body>
+</html>
